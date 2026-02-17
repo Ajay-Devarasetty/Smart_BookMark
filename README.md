@@ -59,6 +59,8 @@ Open http://localhost:3000 — the app redirects to `/login` which shows the cen
 
 - The navbar and layout had visibility/alignment issues. I adjusted colors, centered the main content, and moved the sign-in button to the login page so the UI feels cleaner.
 
+- After deploying to Vercel, Google sign-in initially failed (redirect/env settings). I fixed it by adding the app URL to Supabase redirect URLs and setting the Supabase env vars in Vercel.
+
 ---
 
 ## How to test realtime (quick)

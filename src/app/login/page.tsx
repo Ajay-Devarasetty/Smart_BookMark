@@ -7,7 +7,7 @@ export default function Login() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/dashboard",
+        redirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
       },
     });
   };
