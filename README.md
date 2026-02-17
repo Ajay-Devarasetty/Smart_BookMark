@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Bookmark
 
-## Getting Started
+A small Next.js 13 app that lets authenticated users save and manage bookmarks. Key features:
 
-First, run the development server:
+- Google OAuth sign-in via Supabase
+- Add / delete bookmarks scoped to the signed-in user
+- Real-time updates across browser tabs using Supabase Realtime
+- Responsive UI with client-side React components
+
+---
+
+## Tech stack
+
+- Next.js (App Router)
+- React (client components for interactive parts)
+- Supabase (Auth + Postgres + Realtime)
+- Tailwind CSS for styling
+
+---
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a Supabase project and set the following environment variables (in `.env.local`):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+3. Enable Realtime (publications) for the `bookmarks` table in your Supabase project so realtime events are delivered.
+
+4. Run the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 — the app redirects to `/login` which shows the centered **Sign in with Google** button.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How it works (high level)
 
-## Learn More
+- On login the app shows a `Logout` control in the navbar and displays a bookmark form + list for the signed-in user.
+- Adding a bookmark inserts a row with `user_id` = current user. The UI updates locally and other tabs receive realtime events to update their lists.
+- The `BookmarkList` component subscribes to Supabase realtime events filtered to `user_id` for INSERT/UPDATE/DELETE and applies payloads directly to state.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Problems I ran into & how I fixed them
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- New bookmarks didn't show up right away. I fixed this by making the form tell the list to refresh, and later added realtime updates so other browser tabs see new bookmarks instantly.
 
-## Deploy on Vercel
+- I saw errors about React hooks. That happened because some files were running as server components — I marked interactive files with "use client" so hooks work properly.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- The navbar and layout had visibility/alignment issues. I adjusted colors, centered the main content, and moved the sign-in button to the login page so the UI feels cleaner.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## How to test realtime (quick)
+
+1. Run the app and sign in with Google in two browser tabs.
+2. In tab A, add a bookmark. In tab B you should see the new bookmark appear instantly.
